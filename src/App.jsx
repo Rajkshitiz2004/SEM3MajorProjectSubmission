@@ -4,6 +4,7 @@ import Header from './components/Header';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
+import TranslationWidget from './components/TranslationWidget';
 
 function App() {
   return (
@@ -26,6 +27,9 @@ function App() {
 
       {/* Comprehensive Government-style Footer */}
       <Footer />
+
+      {/* Floating English ↔ Hindi Translation Widget */}
+      <TranslationWidget />
     </div>
   );
 }
