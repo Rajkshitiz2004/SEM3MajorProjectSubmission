@@ -314,6 +314,110 @@
   border: 1.5px solid rgba(255, 153, 51, 0.4);
 }
 
+/* FAB while page translation is running */
+.tw-fab.is-translating {
+  opacity: 0.88;
+  cursor: wait;
+}
+
+/* Spinning icon inside FAB */
+.tw-fab-spin {
+  animation: tw-spin 0.9s linear infinite;
+}
+
+/* ── Live mode footer badge variant ──────────────────────────────────────── */
+.tw-mock-badge--live {
+  background: var(--color-india-green, #138808);
+}
+
+/* ── Page-level progress bar (bottom of viewport) ────────────────────────── */
+.tw-progress-bar-wrap {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 1300;
+  background: rgba(11, 37, 69, 0.08);
+  overflow: hidden;
+}
+
+.tw-progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    var(--color-saffron, #FF9933) 0%,
+    var(--color-india-green, #138808) 100%
+  );
+  transition: width 0.25s ease;
+  border-radius: 0 2px 2px 0;
+}
+
+/* ── Progress bar inside the panel ───────────────────────────────────────── */
+.tw-panel-progress {
+  position: relative;
+  height: 4px;
+  background: #E2E8F0;
+  overflow: hidden;
+}
+
+.tw-panel-progress-fill {
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    var(--color-saffron, #FF9933),
+    var(--color-india-green, #138808)
+  );
+  transition: width 0.2s ease;
+}
+
+.tw-panel-progress-label {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--color-text-muted, #64748B);
+  background: #fff;
+  padding: 0 2px;
+  line-height: 1;
+}
+
+/* ── Retry button (floats above FAB on the right) ────────────────────────── */
+.tw-retry-btn {
+  position: fixed;
+  bottom: 5.5rem;
+  right: 1.75rem;
+  z-index: 1200;
+
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+
+  background: #FEF2F2;
+  color: #DC2626;
+  border: 1.5px solid #FECACA;
+  border-radius: 9999px;
+  padding: 0.4rem 0.9rem;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.2);
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.tw-retry-btn:hover {
+  background: #FEE2E2;
+  transform: translateY(-1px);
+}
+
+.tw-retry-btn:focus-visible {
+  outline: 2px solid #DC2626;
+  outline-offset: 2px;
+}
+
 /* ── Responsive ───────────────────────────────────────────────────────────── */
 @media (max-width: 480px) {
   .tw-panel {
@@ -327,6 +431,11 @@
     right: 0.75rem;
     bottom: 1.25rem;
   }
+
+  .tw-retry-btn {
+    right: 0.75rem;
+    bottom: 4.75rem;
+  }
 }
 
 /* ── Reduced-motion support ───────────────────────────────────────────────── */
@@ -337,8 +446,13 @@
   .tw-fab {
     transition: none;
   }
-  .tw-spinner {
+  .tw-spinner,
+  .tw-fab-spin {
     animation: tw-spin 1.5s linear infinite;
+  }
+  .tw-progress-bar-fill,
+  .tw-panel-progress-fill {
+    transition: none;
   }
 }
 

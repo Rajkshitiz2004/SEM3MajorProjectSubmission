@@ -5,16 +5,17 @@ import { SUPPORTED_LANGUAGES } from '../data/mockTranslations';
 /**
  * LanguageSelector
  * Compact floating panel rendered inside the TranslationWidget.
- * Closes on Escape key (handled via useEffect).
+ * Closes on Escape key or when clicking outside (handled via useEffect).
  *
  * Props:
- *  - selectedLang {string}    ISO code of the currently active language
- *  - onSelect     {function}  Called with the chosen language code
- *  - onClose      {function}  Called when the panel should close
- *  - isLoading    {boolean}   Disables interactions while a translation is in progress
- *  - status       {'idle'|'loading'|'success'|'error'}  Current translation status
- *  - statusMsg    {string}    Human-readable status message
- *  - isMock       {boolean}   Whether mock mode is active
+ *  - selectedLang {string}         ISO code of the currently active language
+ *  - onSelect     {function}       Called with the chosen language code
+ *  - onClose      {function}       Called when the panel should close
+ *  - isLoading    {boolean}        Disables interactions while a translation is in progress
+ *  - status       {'idle'|'loading'|'success'|'error'}
+ *  - statusMsg    {string}         Human-readable status message
+ *  - isMock       {boolean}        Whether mock adapter is active
+ *  - progress     {{ done, total }} Translation progress counters
  */
 export default function LanguageSelector({
   selectedLang,
@@ -24,16 +25,17 @@ export default function LanguageSelector({
   status = 'idle',
   statusMsg = '',
   isMock = false,
+  progress = { done: 0, total: 0 },
 }) {
   const panelRef = useRef(null);
   const closeBtnRef = useRef(null);
 
-  /* Auto-focus the close button when panel opens for keyboard users */
+  /* Auto-focus the close button when panel opens */
   useEffect(() => {
     closeBtnRef.current?.focus();
   }, []);
 
-  /* Keyboard: Escape → close */
+  /* Escape → close */
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
@@ -45,17 +47,15 @@ export default function LanguageSelector({
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
 
-  /* Click-outside to close */
+  /* Click-outside → close */
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (panelRef.current && !panelRef.current.contains(e.target)) {
-        // The FAB button click is handled by parent; ignore it here
-        const fab = document.querySelector('.tw-fab');
-        if (fab && fab.contains(e.target)) return;
-        onClose();
-      }
+      if (!panelRef.current) return;
+      if (panelRef.current.contains(e.target)) return;
+      const fab = document.querySelector('.tw-fab');
+      if (fab?.contains(e.target)) return;
+      onClose();
     };
-    // Slight delay so the same FAB-click that opens the panel doesn't immediately close it
     const timer = setTimeout(() => {
       document.addEventListener('mousedown', handleClickOutside);
     }, 50);
@@ -71,12 +71,14 @@ export default function LanguageSelector({
   };
 
   /* Status bar class */
-  const statusClass = {
-    loading: 'is-loading',
-    success: 'is-success',
-    error: 'is-error',
-    idle: 'is-idle',
-  }[status] ?? 'is-idle';
+  const statusClass =
+    { loading: 'is-loading', success: 'is-success', error: 'is-error', idle: 'is-idle' }[
+      status
+    ] ?? 'is-idle';
+
+  /* Progress percentage */
+  const progressPct =
+    progress.total > 0 ? Math.round((progress.done / progress.total) * 100) : 0;
 
   return (
     <div
@@ -85,6 +87,7 @@ export default function LanguageSelector({
       role="dialog"
       aria-modal="true"
       aria-label="Language selection panel"
+      data-no-translate
     >
       {/* ── Panel Header ── */}
       <div className="tw-panel-header">
@@ -118,6 +121,19 @@ export default function LanguageSelector({
         )}
         <span>{statusMsg || (status === 'idle' ? 'Choose a language below' : '')}</span>
       </div>
+
+      {/* ── Progress Bar (inside panel) ── */}
+      {status === 'loading' && progress.total > 0 && (
+        <div className="tw-panel-progress" aria-hidden="true">
+          <div
+            className="tw-panel-progress-fill"
+            style={{ width: `${progressPct}%` }}
+          />
+          <span className="tw-panel-progress-label">
+            {progress.done} / {progress.total}
+          </span>
+        </div>
+      )}
 
       {/* ── Language Option List ── */}
       <ul
@@ -157,18 +173,20 @@ export default function LanguageSelector({
 
       <div className="tw-divider" aria-hidden="true" />
 
-      {/* ── Mode Notice ── */}
-      {isMock ? (
-        <div className="tw-mock-footer" role="note" aria-label="Mock mode active">
-          <span className="tw-mock-badge">MOCK</span>
-          <span>Using local mock translations — offline demo mode.</span>
-        </div>
-      ) : (
-        <div className="tw-mock-footer" role="note" aria-label="Backend API connected" style={{ background: '#F0FDF4', borderColor: '#BBF7D0', color: '#166534' }}>
-          <span className="tw-mock-badge" style={{ background: '#16A34A' }}>API</span>
-          <span>FastAPI backend translation connected.</span>
-        </div>
-      )}
+      {/* ── Mock / Live Mode Footer ── */}
+      <div className="tw-mock-footer" role="note">
+        {isMock ? (
+          <>
+            <span className="tw-mock-badge">MOCK</span>
+            <span>Using local sample translations — no API connected yet.</span>
+          </>
+        ) : (
+          <>
+            <span className="tw-mock-badge tw-mock-badge--live">LIVE</span>
+            <span>Connected to RajBhasha AI translation API.</span>
+          </>
+        )}
+      </div>
     </div>
   );
 }
