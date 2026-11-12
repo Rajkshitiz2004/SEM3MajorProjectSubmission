@@ -1,41 +1,33 @@
 import React, { useState, useCallback } from 'react';
 import { Languages } from 'lucide-react';
 import LanguageSelector from './LanguageSelector';
-import { DEFAULT_LANGUAGE, getLanguageByCode, mockTranslate } from '../data/mockTranslations';
+import { DEFAULT_LANGUAGE, getLanguageByCode } from '../data/mockTranslations';
+import { useTranslation } from '../hooks/useTranslation';
 import '../styles/translation-widget.css';
 
 /**
  * TranslationWidget
  * ─────────────────
  * A floating FAB (Floating Action Button) that opens a compact language
- * selector panel. Manages translation state using local mock data.
- *
- * Translation state shape (ready for real API swap):
- * {
- *   selectedLang : string,           // ISO code, e.g. 'en' | 'hi'
- *   status       : 'idle' | 'loading' | 'success' | 'error',
- *   statusMsg    : string,
- *   isLoading    : boolean,
- *   lastTranslated: string | null,   // last translated text (demo only)
- *   isMock       : boolean,
- * }
- *
- * To wire up a real API later:
- *   Replace the `mockTranslate(...)` call inside `handleLanguageSelect`
- *   with your actual API fetch. The state shape stays identical.
+ * selector panel. Connects to backend translation API (or mock adapter)
+ * using the custom useTranslation hook.
  */
 export default function TranslationWidget() {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
-  const [translationState, setTranslationState] = useState({
-    selectedLang: DEFAULT_LANGUAGE,
-    status: 'idle',
-    statusMsg: 'Choose a language below',
-    isLoading: false,
-    lastTranslated: null,
-    isMock: true,
+
+  const {
+    selectedLang,
+    status,
+    statusMsg,
+    isLoading,
+    isMock,
+    translate,
+  } = useTranslation({
+    initialLanguage: DEFAULT_LANGUAGE,
+    websiteId: Number(import.meta.env.VITE_DEFAULT_WEBSITE_ID) || 1,
   });
 
-  const selectedLangMeta = getLanguageByCode(translationState.selectedLang);
+  const selectedLangMeta = getLanguageByCode(selectedLang);
 
   /* ── Open / Close Panel ── */
   const openPanel = () => setIsPanelOpen(true);
@@ -45,63 +37,21 @@ export default function TranslationWidget() {
   const handleLanguageSelect = useCallback(
     async (code) => {
       // No-op if same language is re-selected
-      if (code === translationState.selectedLang) {
+      if (code === selectedLang) {
         closePanel();
         return;
       }
 
-      // Set loading state immediately
-      setTranslationState((prev) => ({
-        ...prev,
-        status: 'loading',
-        statusMsg: 'Translating…',
-        isLoading: true,
-      }));
-
       try {
-        // Demo: translate a sample phrase to verify mock works
+        // Sample portal phrase to trigger translation
         const sampleText = 'National Electricity Services Portal';
-        const result = await mockTranslate(sampleText, code);
-
-        setTranslationState({
-          selectedLang: code,
-          status: 'success',
-          statusMsg:
-            code === 'en'
-              ? 'Switched to English'
-              : 'हिन्दी में स्विच किया गया',
-          isLoading: false,
-          lastTranslated: result.translatedText,
-          isMock: result.isMock,
-        });
-
-        // Reset to idle after a short display window
-        setTimeout(() => {
-          setTranslationState((prev) => ({
-            ...prev,
-            status: 'idle',
-            statusMsg: 'Choose a language below',
-          }));
-        }, 2200);
-      } catch {
-        setTranslationState((prev) => ({
-          ...prev,
-          status: 'error',
-          statusMsg: 'Translation failed. Please try again.',
-          isLoading: false,
-        }));
-
-        // Auto-clear error after 3 s
-        setTimeout(() => {
-          setTranslationState((prev) => ({
-            ...prev,
-            status: 'idle',
-            statusMsg: 'Choose a language below',
-          }));
-        }, 3000);
+        await translate(sampleText, code);
+      } catch (err) {
+        // Error state and auto-reset are handled within useTranslation hook
+        console.error('Translation error:', err);
       }
     },
-    [translationState.selectedLang, closePanel]
+    [selectedLang, closePanel, translate]
   );
 
   return (
@@ -109,7 +59,7 @@ export default function TranslationWidget() {
       {/* ── Floating Action Button ── */}
       <button
         type="button"
-        className={`tw-fab${translationState.selectedLang === 'hi' ? ' lang-hi' : ''}`}
+        className={`tw-fab${selectedLang === 'hi' ? ' lang-hi' : ''}`}
         onClick={() => (isPanelOpen ? closePanel() : openPanel())}
         aria-label={`Language: ${selectedLangMeta.label}. Click to change language.`}
         aria-expanded={isPanelOpen}
@@ -121,7 +71,7 @@ export default function TranslationWidget() {
         </span>
         <span>{selectedLangMeta.nativeLabel}</span>
         <span className="tw-fab-lang" aria-hidden="true">
-          {translationState.selectedLang.toUpperCase()}
+          {selectedLang.toUpperCase()}
         </span>
       </button>
 
@@ -129,16 +79,16 @@ export default function TranslationWidget() {
       {isPanelOpen && (
         <div id="tw-language-panel">
           <LanguageSelector
-            selectedLang={translationState.selectedLang}
+            selectedLang={selectedLang}
             onSelect={handleLanguageSelect}
             onClose={closePanel}
-            isLoading={translationState.isLoading}
-            status={translationState.status}
-            statusMsg={translationState.statusMsg}
+            isLoading={isLoading}
+            status={status}
+            statusMsg={statusMsg}
+            isMock={isMock}
           />
         </div>
       )}
     </>
   );
 }
-

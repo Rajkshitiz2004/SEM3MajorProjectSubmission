@@ -14,6 +14,7 @@ import { SUPPORTED_LANGUAGES } from '../data/mockTranslations';
  *  - isLoading    {boolean}   Disables interactions while a translation is in progress
  *  - status       {'idle'|'loading'|'success'|'error'}  Current translation status
  *  - statusMsg    {string}    Human-readable status message
+ *  - isMock       {boolean}   Whether mock mode is active
  */
 export default function LanguageSelector({
   selectedLang,
@@ -22,6 +23,7 @@ export default function LanguageSelector({
   isLoading,
   status = 'idle',
   statusMsg = '',
+  isMock = false,
 }) {
   const panelRef = useRef(null);
   const closeBtnRef = useRef(null);
@@ -155,11 +157,18 @@ export default function LanguageSelector({
 
       <div className="tw-divider" aria-hidden="true" />
 
-      {/* ── Mock Mode Notice ── */}
-      <div className="tw-mock-footer" role="note" aria-label="Mock mode active">
-        <span className="tw-mock-badge">MOCK</span>
-        <span>Using local sample translations — no API connected yet.</span>
-      </div>
+      {/* ── Mode Notice ── */}
+      {isMock ? (
+        <div className="tw-mock-footer" role="note" aria-label="Mock mode active">
+          <span className="tw-mock-badge">MOCK</span>
+          <span>Using local mock translations — offline demo mode.</span>
+        </div>
+      ) : (
+        <div className="tw-mock-footer" role="note" aria-label="Backend API connected" style={{ background: '#F0FDF4', borderColor: '#BBF7D0', color: '#166534' }}>
+          <span className="tw-mock-badge" style={{ background: '#16A34A' }}>API</span>
+          <span>FastAPI backend translation connected.</span>
+        </div>
+      )}
     </div>
   );
 }

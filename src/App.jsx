@@ -4,6 +4,10 @@ import Header from './components/Header';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
+import Schemes from './pages/Schemes';
+import Services from './pages/Services';
+import Notices from './pages/Notices';
+import Contact from './pages/Contact';
 import TranslationWidget from './components/TranslationWidget';
 
 function App() {
@@ -18,10 +22,10 @@ function App() {
       {/* Main Page Routing */}
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/schemes" element={<Home />} />
-        <Route path="/services" element={<Home />} />
-        <Route path="/notices" element={<Home />} />
-        <Route path="/contact" element={<Home />} />
+        <Route path="/schemes" element={<Schemes />} />
+        <Route path="/services" element={<Services />} />
+        <Route path="/notices" element={<Notices />} />
+        <Route path="/contact" element={<Contact />} />
         <Route path="*" element={<Home />} />
       </Routes>
 
