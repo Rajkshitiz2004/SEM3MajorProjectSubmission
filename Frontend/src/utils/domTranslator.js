@@ -25,13 +25,13 @@ const RE_PURE_NUMBER = /^\s*[\d,.\s]+\s*$/;
 
 // Date-like strings: "10 Nov 2026", "2026-11-12", "12/11/2026"
 const RE_DATE_LIKE =
-  /^\s*(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}|\d{1,2}\s+[A-Za-z]{3,9}\s+\d{2,4})\s*$/;
+  /^\s*(\d{1,2}[/-]\d{1,2}[/-]\d{2,4}|\d{1,2}\s+[A-Za-z]{3,9}\s+\d{2,4})\s*$/;
 
 // URL-like strings
 const RE_URL = /^(https?:\/\/|www\.)\S+$/i;
 
-// All-punctuation / whitespace only
-const RE_PUNCT_ONLY = /^[\s\W]+$/;
+// All-punctuation / whitespace only (using Unicode properties so Hindi/Devanagari letters are not treated as punctuation)
+const RE_PUNCT_ONLY = /^[\s\p{P}\p{S}]+$/u;
 
 // HTML entity-like artifacts (e.g. &amp;) — unlikely in text nodes but guard anyway
 const RE_TOO_SHORT = /^.{0,1}$/;
@@ -77,6 +77,15 @@ function isSkippedElement(el) {
     if (node.contentEditable === 'true') return true;
     // Skip data-no-translate attribute
     if (node.hasAttribute('data-no-translate')) return true;
+    // Skip sensitive fields and passwords explicitly
+    if (
+      node.hasAttribute('data-sensitive') ||
+      node.getAttribute('type') === 'password' ||
+      node.getAttribute('type') === 'hidden' ||
+      node.classList.contains('sensitive-field')
+    ) {
+      return true;
+    }
     // Skip the translation widget itself (identified by tw-panel / tw-fab classes)
     if (
       node.classList.contains('tw-fab') ||
@@ -188,7 +197,7 @@ export async function translateDom({
   targetLang,
   sourceLang = 'en',
   websiteId = 1,
-  generation,
+  generation = newGeneration(),
   signal,
   onProgress,
   onError,

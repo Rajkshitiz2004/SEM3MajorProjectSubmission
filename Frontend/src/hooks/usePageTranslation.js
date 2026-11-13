@@ -44,7 +44,7 @@ export function usePageTranslation({
   // ── Progress state ──────────────────────────────────────────────────────────
   const [progress, setProgress] = useState({ done: 0, total: 0 });
   const [failedCount, setFailedCount] = useState(0);
-  const [failedNodes, setFailedNodes] = useState([]); // { node, text }[]
+  const [_failedNodes, setFailedNodes] = useState([]); // { node, text }[]
 
   // ── Internal refs ───────────────────────────────────────────────────────────
   const abortRef = useRef(null);         // current AbortController
@@ -96,7 +96,6 @@ export function usePageTranslation({
       setFailedNodes([]);
       onStatusChange?.('loading', `Translating page… (0 / ${total})`);
 
-      let doneCount = 0;
       const localFailedNodes = [];
 
       try {
@@ -110,7 +109,6 @@ export function usePageTranslation({
           generation,
           signal: controller.signal,
           onProgress: (done, tot) => {
-            doneCount = done;
             setProgress({ done, total: tot });
             onStatusChange?.(
               'loading',

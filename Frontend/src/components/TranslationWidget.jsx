@@ -34,6 +34,8 @@ export default function TranslationWidget() {
     websiteId: Number(import.meta.env.VITE_DEFAULT_WEBSITE_ID) || 1,
   });
 
+  const [localStatus, setLocalStatus] = useState({ status: 'idle', msg: 'Choose a language below' });
+
   /* ── Status reported up from page-translation hook ── */
   const statusRef = useRef({ status: 'idle', msg: '' });
 
@@ -44,8 +46,6 @@ export default function TranslationWidget() {
     // status display is managed via our own localStatus state.
     setLocalStatus({ status: newStatus, msg });
   }, []);
-
-  const [localStatus, setLocalStatus] = useState({ status: 'idle', msg: 'Choose a language below' });
 
   /* ── Page-level DOM translation ── */
   const { progress, failedCount, retryFailed } = usePageTranslation({
@@ -72,7 +72,7 @@ export default function TranslationWidget() {
       setSelectedLang(code);
       setLocalStatus({ status: 'loading', msg: 'Starting page translation…' });
     },
-    [selectedLang, closePanel, setSelectedLang]
+    [selectedLang, closePanel, setSelectedLang, setLocalStatus]
   );
 
   /* ── Effective status for the panel display ── */
