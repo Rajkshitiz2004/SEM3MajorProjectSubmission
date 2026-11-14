@@ -94,8 +94,8 @@ To run the complete full-stack project for a live demonstration:
 
 ### Terminal 1: Python FastAPI Translation Backend
 ```bash
-# Navigate to the backend directory (adjust path based on your folder structure)
-cd ../Backend
+# Navigate to the backend directory
+cd Backend
 
 # Activate virtual environment
 source venv/bin/activate  # On Windows: venv\Scripts\activate
