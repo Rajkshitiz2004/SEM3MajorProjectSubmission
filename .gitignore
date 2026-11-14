@@ -1,3 +1,22 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+!*.env.example
+
+# Production builds
+dist
+dist-ssr
+build
+
 # Logs
 logs
 *.log
@@ -7,12 +26,15 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# Runtime & cache
 *.local
+.cache/
+.vite/
+.parcel-cache/
+.huggingface/
+onnx-models/
 
-# Editor directories and files
+# Editor & OS files
 .vscode/*
 !.vscode/extensions.json
 .idea
@@ -22,3 +44,4 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+Thumbs.db
