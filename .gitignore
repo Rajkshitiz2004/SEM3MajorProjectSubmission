@@ -45,3 +45,4 @@ onnx-models/
 *.sln
 *.sw?
 Thumbs.db
+coverage
