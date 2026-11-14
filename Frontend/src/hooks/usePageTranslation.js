@@ -170,17 +170,33 @@ export function usePageTranslation({
     }
 
     const observer = new MutationObserver((mutations) => {
-      // Skip mutations we ourselves caused (text node writes)
+      // Skip mutations we ourselves caused (text node writes) or when active translation is underway
       if (isTranslatingRef.current) return;
       if (activeLangRef.current === sourceLang) return;
 
-      // Check if any added node has text content worth translating
+      // Check if any added node has text content worth translating, ignoring translation widget elements
       const hasNewText = mutations.some((m) =>
-        Array.from(m.addedNodes).some(
-          (n) =>
-            n.nodeType === Node.TEXT_NODE ||
-            (n.nodeType === Node.ELEMENT_NODE && n.textContent?.trim().length > 2)
-        )
+        Array.from(m.addedNodes).some((n) => {
+          if (n.nodeType === Node.ELEMENT_NODE) {
+            if (
+              n.classList?.contains('tw-panel') ||
+              n.classList?.contains('tw-fab') ||
+              n.classList?.contains('tw-progress-bar-wrap') ||
+              n.id === 'tw-language-panel' ||
+              n.closest?.('#tw-language-panel, .tw-fab, .tw-panel')
+            ) {
+              return false;
+            }
+            return n.textContent?.trim().length > 2;
+          }
+          if (n.nodeType === Node.TEXT_NODE) {
+            if (n.parentElement?.closest?.('#tw-language-panel, .tw-fab, .tw-panel')) {
+              return false;
+            }
+            return n.nodeValue?.trim().length > 2;
+          }
+          return false;
+        })
       );
 
       if (!hasNewText) return;
