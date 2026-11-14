@@ -11,10 +11,21 @@ const { translatePublic } = require("./controllers/translation.controller");
 
 const app = express();
 
-// Enable CORS for frontend dev origins
+// Enable CORS for frontend dev and production origins
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://127.0.0.1:5173"],
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, or same-origin Vercel rewrites)
+      if (!origin) return callback(null, true);
+      if (
+        origin.includes("localhost") ||
+        origin.includes("127.0.0.1") ||
+        origin.endsWith(".vercel.app")
+      ) {
+        return callback(null, true);
+      }
+      return callback(null, true);
+    },
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "Accept"],
     credentials: true
@@ -22,6 +33,16 @@ app.use(
 );
 app.use(express.json({ limit: "32kb" }));
 
+// Health-check endpoint
+app.get("/api/health", (req, res) => {
+  res.json({
+    message: "RajBhasha AI Backend Running",
+    status: "healthy",
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Legacy root check (fallback for direct backend calls)
 app.get("/", (req, res) => {
   res.json({
     message: "RajBhasha AI Backend Running",
