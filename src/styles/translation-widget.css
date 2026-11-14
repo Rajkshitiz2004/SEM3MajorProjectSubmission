@@ -1,0 +1,458 @@
+/* =============================================================================
+   translation-widget.css
+   Floating language switcher widget — visually consistent with RajBhasha AI
+   government portal theme (navy, saffron, india-green, clean whites).
+   ============================================================================= */
+
+/* ── Floating Trigger Button ─────────────────────────────────────────────── */
+.tw-fab {
+  position: fixed;
+  bottom: 1.75rem;
+  right: 1.75rem;
+  z-index: 1200;
+
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  background: var(--color-primary-navy, #0B2545);
+  color: #ffffff;
+  border: none;
+  border-radius: 9999px;
+  padding: 0.65rem 1.1rem 0.65rem 0.85rem;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(11, 37, 69, 0.45), 0 1px 4px rgba(0,0,0,0.2);
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+  user-select: none;
+}
+
+.tw-fab:hover {
+  background: var(--color-primary-light, #133966);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(11, 37, 69, 0.5), 0 2px 6px rgba(0,0,0,0.25);
+}
+
+.tw-fab:focus-visible {
+  outline: 3px solid var(--color-saffron, #FF9933);
+  outline-offset: 3px;
+}
+
+.tw-fab:active {
+  transform: translateY(0);
+}
+
+/* Globe icon inside FAB */
+.tw-fab-globe {
+  font-size: 1.1rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+
+/* Current language abbreviation badge on FAB */
+.tw-fab-lang {
+  background: rgba(255, 153, 51, 0.25);
+  border: 1px solid rgba(255, 153, 51, 0.5);
+  color: var(--color-saffron, #FF9933);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.1rem 0.4rem;
+  border-radius: 9999px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ── Translation Widget Panel ─────────────────────────────────────────────── */
+.tw-panel {
+  position: fixed;
+  bottom: 5.5rem;
+  right: 1.75rem;
+  z-index: 1200;
+
+  width: 300px;
+  background: #ffffff;
+  border: 1px solid var(--color-border, #E2E8F0);
+  border-radius: 14px;
+  box-shadow: 0 20px 40px rgba(11, 37, 69, 0.18), 0 6px 16px rgba(0,0,0,0.1);
+  overflow: hidden;
+
+  /* Slide-up entrance animation */
+  animation: tw-slideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+  transform-origin: bottom right;
+}
+
+@keyframes tw-slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ── Panel Header ─────────────────────────────────────────────────────────── */
+.tw-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1rem 0.75rem;
+  background: var(--color-primary-navy, #0B2545);
+  color: #ffffff;
+}
+
+.tw-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.tw-panel-globe {
+  font-size: 1.1rem;
+}
+
+.tw-panel-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  flex-shrink: 0;
+}
+
+.tw-panel-close:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.tw-panel-close:focus-visible {
+  outline: 2px solid var(--color-saffron, #FF9933);
+  outline-offset: 2px;
+}
+
+/* ── Status Bar (loading / success / error) ───────────────────────────────── */
+.tw-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border-bottom: 1px solid var(--color-border, #E2E8F0);
+  min-height: 36px;
+}
+
+/* Loading state */
+.tw-status-bar.is-loading {
+  background: #EFF6FF;
+  color: #1D4ED8;
+}
+
+/* Success state */
+.tw-status-bar.is-success {
+  background: var(--color-india-green-light, #EBF8EC);
+  color: var(--color-india-green, #138808);
+}
+
+/* Error state */
+.tw-status-bar.is-error {
+  background: #FEF2F2;
+  color: #DC2626;
+}
+
+/* Idle / neutral state */
+.tw-status-bar.is-idle {
+  background: #F8FAFC;
+  color: var(--color-text-muted, #64748B);
+}
+
+/* Spinner */
+.tw-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: tw-spin 0.65s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes tw-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Language Option List ─────────────────────────────────────────────────── */
+.tw-lang-list {
+  list-style: none;
+  padding: 0.5rem;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.tw-lang-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 0.85rem;
+  border: 1.5px solid transparent;
+  border-radius: 9px;
+  background: none;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  position: relative;
+}
+
+.tw-lang-btn:hover:not(:disabled) {
+  background: #F1F5F9;
+  border-color: var(--color-border, #E2E8F0);
+}
+
+.tw-lang-btn:focus-visible {
+  outline: 2px solid var(--color-primary-navy, #0B2545);
+  outline-offset: 2px;
+}
+
+.tw-lang-btn.is-active {
+  background: #EFF6FF;
+  border-color: var(--color-primary-navy, #0B2545);
+}
+
+.tw-lang-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Flag emoji inside button */
+.tw-lang-flag {
+  font-size: 1.35rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* Text labels container */
+.tw-lang-labels {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.tw-lang-native {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-text-main, #1E293B);
+  line-height: 1.25;
+}
+
+.tw-lang-en {
+  font-size: 0.75rem;
+  color: var(--color-text-muted, #64748B);
+  line-height: 1.3;
+}
+
+/* Checkmark for active language */
+.tw-lang-check {
+  color: var(--color-primary-navy, #0B2545);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* ── Divider Line ─────────────────────────────────────────────────────────── */
+.tw-divider {
+  height: 1px;
+  background: var(--color-border, #E2E8F0);
+  margin: 0;
+}
+
+/* ── Mock Mode Footer ─────────────────────────────────────────────────────── */
+.tw-mock-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  background: #FFFBEB;
+  border-top: 1px solid #FDE68A;
+  font-size: 0.75rem;
+  color: #92400E;
+  font-weight: 500;
+}
+
+.tw-mock-badge {
+  background: #D97706;
+  color: #ffffff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+/* ── Current Lang Indicator on FAB (active mode) ─────────────────────────── */
+.tw-fab.lang-hi {
+  background: linear-gradient(135deg, var(--color-primary-navy, #0B2545) 0%, #0D3B6E 100%);
+  border: 1.5px solid rgba(255, 153, 51, 0.4);
+}
+
+/* FAB while page translation is running */
+.tw-fab.is-translating {
+  opacity: 0.88;
+  cursor: wait;
+}
+
+/* Spinning icon inside FAB */
+.tw-fab-spin {
+  animation: tw-spin 0.9s linear infinite;
+}
+
+/* ── Live mode footer badge variant ──────────────────────────────────────── */
+.tw-mock-badge--live {
+  background: var(--color-india-green, #138808);
+}
+
+/* ── Page-level progress bar (bottom of viewport) ────────────────────────── */
+.tw-progress-bar-wrap {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 1300;
+  background: rgba(11, 37, 69, 0.08);
+  overflow: hidden;
+}
+
+.tw-progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    var(--color-saffron, #FF9933) 0%,
+    var(--color-india-green, #138808) 100%
+  );
+  transition: width 0.25s ease;
+  border-radius: 0 2px 2px 0;
+}
+
+/* ── Progress bar inside the panel ───────────────────────────────────────── */
+.tw-panel-progress {
+  position: relative;
+  height: 4px;
+  background: #E2E8F0;
+  overflow: hidden;
+}
+
+.tw-panel-progress-fill {
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    var(--color-saffron, #FF9933),
+    var(--color-india-green, #138808)
+  );
+  transition: width 0.2s ease;
+}
+
+.tw-panel-progress-label {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--color-text-muted, #64748B);
+  background: #fff;
+  padding: 0 2px;
+  line-height: 1;
+}
+
+/* ── Retry button (floats above FAB on the right) ────────────────────────── */
+.tw-retry-btn {
+  position: fixed;
+  bottom: 5.5rem;
+  right: 1.75rem;
+  z-index: 1200;
+
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+
+  background: #FEF2F2;
+  color: #DC2626;
+  border: 1.5px solid #FECACA;
+  border-radius: 9999px;
+  padding: 0.4rem 0.9rem;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.2);
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.tw-retry-btn:hover {
+  background: #FEE2E2;
+  transform: translateY(-1px);
+}
+
+.tw-retry-btn:focus-visible {
+  outline: 2px solid #DC2626;
+  outline-offset: 2px;
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .tw-panel {
+    right: 0.75rem;
+    left: 0.75rem;
+    width: auto;
+    bottom: 5rem;
+  }
+
+  .tw-fab {
+    right: 0.75rem;
+    bottom: 1.25rem;
+  }
+
+  .tw-retry-btn {
+    right: 0.75rem;
+    bottom: 4.75rem;
+  }
+}
+
+/* ── Reduced-motion support ───────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .tw-panel {
+    animation: none;
+  }
+  .tw-fab {
+    transition: none;
+  }
+  .tw-spinner,
+  .tw-fab-spin {
+    animation: tw-spin 1.5s linear infinite;
+  }
+  .tw-progress-bar-fill,
+  .tw-panel-progress-fill {
+    transition: none;
+  }
+}
+
