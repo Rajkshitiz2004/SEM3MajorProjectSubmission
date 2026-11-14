@@ -70,6 +70,7 @@ export default function TranslationWidget() {
       }
       // Commit language change — usePageTranslation reacts to selectedLang change
       setSelectedLang(code);
+      closePanel(); // Close panel immediately so user sees translation progress
       setLocalStatus({ status: 'loading', msg: 'Starting page translation…' });
     },
     [selectedLang, closePanel, setSelectedLang, setLocalStatus]

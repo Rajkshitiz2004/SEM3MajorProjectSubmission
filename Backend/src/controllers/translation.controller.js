@@ -6,6 +6,11 @@ const {
 } = require("../services/ai.service");
 const { governmentGlossary } = require("../services/glossary.service");
 
+// Separate in-memory cache for AI-generated translations.
+// Keeps dynamically generated results isolated from the official
+// government glossary so wrong AI outputs cannot corrupt known terms.
+const aiTranslationCache = {};
+
 // Public translation endpoint adhering to Frontend translation contract:
 // POST /api/v1/translate
 // Request: { website_id, text, source_language, target_language }
@@ -57,11 +62,16 @@ const translatePublic = async (req, res) => {
       }
     }
 
-    // 3. Fallback to AI translation model
+    // 3. Check AI cache before calling the model
+    if (!translatedText) {
+      translatedText = aiTranslationCache[trimmed];
+    }
+
+    // 4. Fallback to AI translation model
     if (!translatedText) {
       translatedText = await translateToHindi(trimmed);
-      // Cache dynamically generated translation in memory glossary
-      governmentGlossary[trimmed] = translatedText;
+      // Cache AI result separately — never mutate the official glossary
+      aiTranslationCache[trimmed] = translatedText;
     }
 
     return res.json({
@@ -95,7 +105,7 @@ const translate = async (req, res) => {
     }
 
     if (websiteId !== undefined && websiteId !== null) {
-      if (typeof websiteId !== "string") {
+      if (typeof websiteId !== "string" && typeof websiteId !== "number") {
         return res.status(400).json({
           message: "Invalid website ID"
         });
