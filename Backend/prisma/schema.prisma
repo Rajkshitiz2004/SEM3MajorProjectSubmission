@@ -1,0 +1,86 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  REVIEWER
+  USER
+}
+
+enum TranslationStatus {
+  MACHINE
+  APPROVED
+  REJECTED
+}
+
+model User {
+  id           String        @id @default(uuid())
+  name         String
+  email        String        @unique
+  password     String
+  role         Role          @default(USER)
+  createdAt    DateTime      @default(now())
+
+  websites     Website[]
+  translations Translation[]
+  reviews      TranslationReview[]
+}
+
+model Website {
+  id           String        @id @default(uuid())
+  name         String
+  domain       String        @unique
+  userId       String
+  createdAt    DateTime      @default(now())
+
+  user         User          @relation(fields: [userId], references: [id])
+  translations Translation[]
+  glossary     GlossaryTerm[]
+}
+
+model Translation {
+  id             String            @id @default(uuid())
+  sourceText     String            @db.Text
+  translatedText String            @db.Text
+  sourceLanguage String            @default("en")
+  targetLanguage String            @default("hi")
+  status         TranslationStatus @default(MACHINE)
+  createdAt      DateTime          @default(now())
+
+  userId         String
+  websiteId      String?
+
+  user           User              @relation(fields: [userId], references: [id])
+  website        Website?          @relation(fields: [websiteId], references: [id])
+  reviews        TranslationReview[]
+}
+
+model TranslationReview {
+  id            String       @id @default(uuid())
+  translationId String
+  reviewerId    String
+  correctedText String?      @db.Text
+  comments      String?      @db.Text
+  createdAt     DateTime     @default(now())
+
+  translation   Translation  @relation(fields: [translationId], references: [id])
+  reviewer      User         @relation(fields: [reviewerId], references: [id])
+}
+
+model GlossaryTerm {
+  id          String   @id @default(uuid())
+  englishTerm String
+  hindiTerm   String
+  websiteId   String
+
+  website     Website  @relation(fields: [websiteId], references: [id])
+
+  @@unique([websiteId, englishTerm])
+}

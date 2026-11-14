@@ -1,311 +1,182 @@
-# RajBhasha AI — English-to-Hindi Government Website Translator
-
-> **Academic Demonstration Project — Third Semester College Project**
-> This is **not** an official government website. All content is fictional and used solely for demonstrating translation functionality.
-
----
-
-## 📋 Project Overview
-
-**RajBhasha AI** is a full-stack web application that demonstrates English-to-Hindi translation on a realistic Indian government-style electricity services portal.
-
-| Layer | Technology |
-|-------|-----------|
-| Frontend | React 19 + Vite 8, React Router v7, Lucide React icons |
-| Translation Widget | Vanilla JS DOM walker + React hooks |
-| Backend (separate repo / folder) | Python FastAPI + AI translation engine |
-| Testing | Vitest 4, React Testing Library, jsdom |
-| Linting | oxlint |
+# RajBhasha AI (राजभाषा AI)
+> **AI-Powered Localized Translation Prototype for Government Citizen Portals**  
+> *Academic Major Project — Semester 3 Submission*
 
 ---
 
-## 👥 Team Members & Responsibilities
+## 📌 Project Overview
 
-| Member | Prompts | Deliverables |
-|--------|---------|-------------|
-| Member 1 | Prompt 1 & 4 | Website layout, navigation, government pages (Schemes, Services, Notices, Contact) |
-| Member 2 | Prompt 2 & 5 | Translation widget UI, language selector, page-level DOM translation |
-| **Member 3 (you)** | **Prompt 3 & 6** | **API client, final integration, automated tests, documentation** |
+**RajBhasha AI** is a real-time, in-place DOM translation system tailored for Indian digital governance portals (demonstrated on the **Ministry of Power - National Electricity Services Portal**). It allows seamless on-the-fly toggling between English and Hindi (`en` ↔ `hi`) directly in the browser while preserving DOM hierarchies, dynamic React state, accessibility attributes, and official government terminologies.
+
+The architecture combines a fast, accurate **Government Glossary Service** for official departments and civic terms with a local machine-learning pipeline powered by `@huggingface/transformers` (`opus-mt-en-hi`) for arbitrary text translation.
 
 ---
 
-## 🗂️ Project Structure
+## 🏛️ Key Features
 
-```
-SEM3MajorProjectSubmission-main/
-├── src/
-│   ├── components/
-│   │   ├── Header.jsx            # Top government information bar
-│   │   ├── Navbar.jsx            # Responsive navigation
-│   │   ├── Footer.jsx            # Government-style footer
-│   │   ├── Hero.jsx              # Homepage hero section
-│   │   ├── ServiceCard.jsx       # Reusable service card
-│   │   ├── TranslationWidget.jsx # Floating language-switcher FAB
-│   │   └── LanguageSelector.jsx  # Language options panel
-│   ├── pages/
-│   │   ├── Home.jsx              # Homepage with services grid
-│   │   ├── Schemes.jsx           # Government schemes page
-│   │   ├── Services.jsx          # Electricity services page
-│   │   ├── Notices.jsx           # Circulars & public notices
-│   │   └── Contact.jsx           # Contact & FAQ page
-│   ├── hooks/
-│   │   ├── useTranslation.js     # Translation state + API health check
-│   │   └── usePageTranslation.js # DOM translation + MutationObserver
-│   ├── services/
-│   │   ├── translationApi.js     # Real FastAPI client (fetch-based)
-│   │   └── mockTranslationApi.js # In-memory mock adapter for dev/test
-│   ├── utils/
-│   │   └── domTranslator.js      # TreeWalker-based safe DOM translator
-│   ├── data/
-│   │   ├── governmentContent.js  # Static page content arrays
-│   │   └── mockTranslations.js   # Mock Hindi dictionary & language config
-│   ├── styles/
-│   │   ├── global.css            # Site-wide styles
-│   │   └── translation-widget.css # Widget styles
-│   ├── tests/
-│   │   ├── setup.js                   # Vitest + jest-dom setup
-│   │   ├── translationApi.test.js     # API client unit tests (40+ cases)
-│   │   ├── TranslationWidget.test.jsx # Widget UI tests (24 cases)
-│   │   └── domTranslator.test.js      # DOM translator unit tests (20 cases)
-│   ├── App.jsx
-│   └── main.jsx
-├── public/
-│   └── favicon.svg
-├── index.html
-├── package.json
-├── vite.config.js
-├── .env.example                  # Environment variable template
-└── README.md
+- **In-Place DOM Text Translation**: Walks the DOM using `TreeWalker` to translate visible text nodes without corrupting event listeners or re-rendering entire components.
+- **Official Terminology Glossary**: Instant, standardized translations for official government terms (e.g. *Ministry of Power*, *PM Surya Ghar*, *DISCOM*, *Tariff*).
+- **On-Device / Local AI Model**: Integrates Hugging Face Transformers (`Xenova/opus-mt-en-hi`) for automatic neural machine translation with local memory caching.
+- **Infinite Loop & Mutation Guard**: Custom `MutationObserver` filtering prevents recursive re-translations caused by widget DOM changes.
+- **Fail-Safe & Restoration**: One-click restore to original English text using a zero-overhead `WeakMap` cache without requiring network requests.
+- **RESTful Architecture**: Secure Node.js & Express backend with PostgreSQL/Prisma ORM for managing multi-tenant websites, translation reviews, and audit trails.
+
+---
+
+## 📂 Project Directory Structure
+
+```text
+SEM3MajorProjectSubmission/
+├── Backend/                      # Node.js + Express + Prisma API
+│   ├── prisma/                   # Prisma schema (PostgreSQL models)
+│   ├── src/
+│   │   ├── config/               # Prisma client and environment setups
+│   │   ├── controllers/          # Translation, auth, and website controllers
+│   │   ├── middleware/           # JWT authentication middleware
+│   │   ├── routes/               # Express route declarations
+│   │   ├── services/             # AI service (Transformers) & Glossary service
+│   │   └── app.js                # Express app entrypoint & CORS setup
+│   ├── .env.example              # Example environment configuration for Backend
+│   └── package.json
+│
+├── Frontend/                     # Vite + React Portal Demonstration
+│   ├── src/
+│   │   ├── components/           # Navbar, Header, Hero, LanguageSelector, TranslationWidget
+│   │   ├── data/                 # Language options and mock translation dictionaries
+│   │   ├── hooks/                # usePageTranslation, useTranslation
+│   │   ├── pages/                # Home, Schemes, Services, Notices, Contact
+│   │   ├── services/             # translationApi.js, mockTranslationApi.js
+│   │   ├── styles/               # CSS styles for portal and floating widget
+│   │   ├── tests/                # Vitest suite (33 unit & integration tests)
+│   │   └── utils/                # domTranslator.js (TreeWalker, WeakMap, Semaphore)
+│   ├── .env.example              # Example environment configuration for Frontend
+│   └── package.json
+│
+├── .gitignore                    # Project-level git ignore rules
+├── .env.example                  # Root environment template
+└── README.md                     # Project documentation
 ```
 
 ---
 
-## ⚡ Quick Start
+## ⚙️ Prerequisites
 
-### Prerequisites
+- **Node.js**: `v18.0.0` or higher (`v20+` recommended)
+- **npm**: `v9.0.0` or higher
+- **PostgreSQL**: (Optional for basic translation demo, required for full auth & website management)
 
-- **Node.js** ≥ 18.x
-- **npm** ≥ 9.x
-- *(Optional for live translation)* Python ≥ 3.10 and the FastAPI backend
+---
 
-### 1. Clone & install
+## 🚀 Quick Start & Setup
 
+### 1. Clone the Repository
 ```bash
-git clone <your-repo-url>
-cd SEM3MajorProjectSubmission-main
-npm install
+git clone https://github.com/Rajkshitiz2004/SEM3MajorProjectSubmission.git
+cd SEM3MajorProjectSubmission
 ```
 
-### 2. Configure environment variables
+### 2. Backend Setup
+1. Open a terminal in the `Backend` directory:
+   ```bash
+   cd Backend
+   npm install
+   ```
 
-```bash
-cp .env.example .env
-# Edit .env as needed (see Environment Configuration section below)
-```
+2. Create `.env` from `.env.example`:
+   ```bash
+   cp .env.example .env
+   ```
+   > **Note on macOS**: Port `5001` is configured by default because port `5000` is reserved by macOS AirPlay / ControlCenter.
 
-### 3. Run the frontend (development mode)
+3. (Optional) Run Prisma migrations if connecting to PostgreSQL:
+   ```bash
+   npx prisma db push
+   ```
 
-```bash
-npm run dev
-# → http://localhost:5173
-```
-
-### 4. Build for production
-
-```bash
-npm run build
-npm run preview   # preview the production build locally
-```
+4. Start the backend server:
+   ```bash
+   npm start
+   # or with auto-reload:
+   npm run dev
+   ```
+   The backend will be live at `http://localhost:5001`.
 
 ---
 
-## 🌐 API Contract
+### 3. Frontend Setup
+1. Open a new terminal in the `Frontend` directory:
+   ```bash
+   cd Frontend
+   npm install
+   ```
 
-The frontend communicates with the FastAPI backend over a single endpoint:
+2. Create `.env` from `.env.example`:
+   ```bash
+   cp .env.example .env
+   ```
+   Ensure `Frontend/.env` has:
+   ```env
+   VITE_API_BASE_URL=http://localhost:5001
+   VITE_USE_MOCK_TRANSLATION=false
+   VITE_TRANSLATION_TIMEOUT_MS=15000
+   VITE_DEFAULT_WEBSITE_ID=1
+   ```
 
-### `POST /api/v1/translate`
-
-**Request body:**
-```json
-{
-  "website_id": 1,
-  "text": "Apply for electricity subsidy",
-  "source_language": "en",
-  "target_language": "hi"
-}
-```
-
-**Success response (200):**
-```json
-{
-  "original_text": "Apply for electricity subsidy",
-  "translated_text": "बिजली सब्सिडी के लिए आवेदन करें",
-  "source_language": "en",
-  "target_language": "hi",
-  "status": "machine"
-}
-```
-
-**Error response (4xx / 5xx):**
-```json
-{
-  "detail": "Human-readable error description"
-}
-```
-
----
-
-## ⚙️ Environment Configuration
-
-Copy `.env.example` to `.env` and set the values:
-
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `VITE_API_BASE_URL` | Base URL of the FastAPI backend | `http://localhost:8000` |
-| `VITE_USE_MOCK_TRANSLATION` | Set `true` to use the in-memory mock dictionary instead of the real API | `false` |
-| `VITE_TRANSLATION_TIMEOUT_MS` | Request timeout in milliseconds (default: 8000) | `8000` |
-| `VITE_DEFAULT_WEBSITE_ID` | Website identifier forwarded to the backend | `1` |
-
-> **Important:** Never set `VITE_USE_MOCK_TRANSLATION=true` in a live demo — mock translations use a limited dictionary and must never be presented as real AI translation.
-
----
-
-## 🐍 Running the FastAPI Backend
-
-The Python backend lives in the `backend/` folder (separate from this frontend). To run it:
-
-```bash
-# From the project root
-cd backend
-python -m venv venv
-source venv/bin/activate       # Windows: venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
-```
-
-Then set `VITE_API_BASE_URL=http://localhost:8000` in your `.env` and restart `npm run dev`.
-
-### Running Frontend + Backend Together
-
-Open **two terminals**:
-
-| Terminal 1 — Backend | Terminal 2 — Frontend |
-|----------------------|----------------------|
-| `cd backend && uvicorn app.main:app --reload` | `cd SEM3MajorProjectSubmission-main && npm run dev` |
-
-The widget will automatically detect the backend at `http://localhost:8000` and use live translation.
+3. Start the Vite development server:
+   ```bash
+   npm run dev
+   ```
+   Open `http://localhost:5173` in your browser.
 
 ---
 
 ## 🧪 Testing
 
-### Run all tests (single pass)
+To run the complete automated test suite (DOM walker tests, widget unit tests, and API contract mocks):
 
 ```bash
-npm run test:run
-```
-
-### Run tests in watch mode (during development)
-
-```bash
+cd Frontend
 npm test
 ```
 
-### Run tests with coverage report
-
-```bash
-npm run test:coverage
+Expected result:
+```text
+✓ src/tests/TranslationWidget.test.jsx (15 tests)
+✓ src/tests/translationApi.test.js (18 tests)
+Test Files  2 passed (2)
+Tests       33 passed (33)
 ```
 
-Coverage is collected for `src/services/`, `src/hooks/`, `src/utils/`, and `src/components/`.
+---
 
-### Run linter
+## 🔌 API Reference (Translation Contract)
 
-```bash
-npm run lint
-```
-
-### Test file overview
-
-| Test File | What It Covers |
-|-----------|---------------|
-| `translationApi.test.js` | `translateText()` — input validation, successful calls, HTTP errors, malformed responses, network failures, AbortSignal cancellation, mock mode |
-| `TranslationWidget.test.jsx` | FAB rendering & ARIA attributes, panel open/close, language options, loading state, mock/live badge, progress bar, retry button |
-| `domTranslator.test.js` | `collectTextNodes()` skip rules, `newGeneration()`, `translateDom()` success/error/abort/progress, `restoreDom()` |
+### Public Translation Endpoint
+- **URL**: `POST /api/v1/translate`
+- **Headers**: `Content-Type: application/json`
+- **Request Body**:
+  ```json
+  {
+    "website_id": 1,
+    "text": "Ministry of Power",
+    "source_language": "en",
+    "target_language": "hi"
+  }
+  ```
+- **Response**:
+  ```json
+  {
+    "website_id": 1,
+    "original_text": "Ministry of Power",
+    "translated_text": "विद्युत मंत्रालय",
+    "source_language": "en",
+    "target_language": "hi",
+    "status": "machine"
+  }
+  ```
 
 ---
 
-## ✅ Manual Testing Checklist
+## 🛡️ License
 
-Work through these on `http://localhost:5173` before the college demo:
-
-### Translation Widget
-- [ ] Floating button (FAB) appears in the bottom-right corner on all pages
-- [ ] Clicking the FAB opens the language selector panel
-- [ ] Pressing **Escape** closes the panel
-- [ ] Clicking outside the panel closes it
-
-### English → Hindi Translation
-- [ ] Select **Hindi** in the panel — page content translates
-- [ ] Progress bar appears during translation
-- [ ] Status message changes from "Translating…" to "हिन्दी में स्विच किया गया"
-- [ ] Widget controls (FAB label, panel text) are **not** translated
-
-### Hindi → English Restoration
-- [ ] Select **English** in the panel — original English text is fully restored
-- [ ] No garbled or missing text after switching back
-
-### Navigation (Multi-Page)
-- [ ] Translate on **Home** page, then navigate to **Schemes** — translation re-applies automatically
-- [ ] Repeat for **Services**, **Notices**, **Contact** pages
-
-### Error Handling
-- [ ] Stop the FastAPI backend (`Ctrl+C`) — widget shows an error message
-- [ ] Retry button appears when translation fails partially
-- [ ] Clicking **Retry** re-attempts failed segments
-
-### Mock Mode
-- [ ] Set `VITE_USE_MOCK_TRANSLATION=true` — widget shows **MOCK** badge (not LIVE)
-- [ ] Translation works offline using the sample dictionary
-
-### Responsiveness
-- [ ] Mobile (375 px) — widget does not overflow; panel is usable
-- [ ] Tablet (768 px) — layout adjusts correctly
-- [ ] Desktop (1280 px+) — full layout displayed
-
-### Accessibility
-- [ ] Tab through the page — widget FAB is reachable via keyboard
-- [ ] FAB `aria-expanded` changes between `true` / `false`
-- [ ] Progress bar has `role="progressbar"` with `aria-valuenow`
-- [ ] Screen reader announces status changes (status bar has `aria-live="polite"`)
-
-### Security
-- [ ] Form fields (name, email, message on Contact page) are **not** translated
-- [ ] API responses cannot inject executable HTML (text nodes are written to `nodeValue`, not `innerHTML`)
-
----
-
-## 🔒 Sensitive Input Protection
-
-The `domTranslator.js` skips the following elements entirely, so their values are **never sent to the translation API**:
-
-- `<input>`, `<textarea>`, `<select>`, `<option>`
-- `<script>`, `<style>`, `<code>`, `<pre>`
-- Any element with `contenteditable="true"`
-- Any element (or its subtree) with `data-no-translate`
-- The translation widget itself (identified by `.tw-fab`, `.tw-panel`, `#tw-language-panel`)
-
----
-
-## 📝 Notes for the College Demo
-
-1. **Start the FastAPI backend first**, then start the frontend.
-2. If the backend is unavailable, enable mock mode (`VITE_USE_MOCK_TRANSLATION=true`) for a local demo.
-3. All page content is **fictional** — do not present it as real government information.
-4. The project is labelled "College Project Demonstration — Not an Official Government Website" in the site header.
-
----
-
-## 📄 License
-
-This project is submitted as part of the **Third Semester Major Project** (Academic Year 2026–27) and is intended for educational purposes only.
+Academic Project Demonstration — Developed for Semester 3 Major Project Submission.
