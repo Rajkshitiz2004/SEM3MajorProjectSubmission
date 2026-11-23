@@ -1,0 +1,183 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1050 720" font-family="Segoe UI, Roboto, sans-serif">
+  <defs>
+    <style>
+      .entity-header { font-weight: bold; font-size: 14px; fill: white; }
+      .attr-text { font-size: 11px; fill: #333; }
+      .pk-text { font-size: 11px; fill: #333; font-weight: 600; }
+      .fk-text { font-size: 11px; fill: #1565c0; }
+      .meta-text { font-size: 9px; fill: #888; }
+      .rel-line { stroke: #666; stroke-width: 1.8; fill: none; }
+      .rel-label { font-size: 10px; fill: #666; font-style: italic; }
+      .card-bg { fill: #ffffff; stroke-width: 2; rx: 8; }
+      .legend-text { font-size: 9px; fill: #666; }
+      .cardinality { font-size: 11px; font-weight: bold; fill: #333; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1050" height="720" fill="#f8f9fa" rx="12"/>
+
+  <!-- Title -->
+  <text x="525" y="35" text-anchor="middle" font-size="18" font-weight="bold" fill="#1a1a2e">RajBhasha AI — Entity-Relationship Diagram</text>
+  <text x="525" y="52" text-anchor="middle" font-size="11" fill="#888">PostgreSQL 16 • 5 Entities • BCNF Normalized • Crow's Foot Notation</text>
+
+  <!-- ========== ENTITY: User (Top Center) ========== -->
+  <g transform="translate(385, 70)">
+    <rect class="card-bg" width="270" height="175" stroke="#4361ee" filter="url(#shadow)"/>
+    <rect width="270" height="32" rx="8" fill="#4361ee"/>
+    <rect x="0" y="24" width="270" height="10" fill="#4361ee"/>
+    <text x="135" y="23" text-anchor="middle" class="entity-header">👤 User</text>
+    <line x1="0" y1="32" x2="270" y2="32" stroke="#e0e0e0"/>
+    <text x="15" y="52" class="pk-text">🔑 id : UUID (PK)</text>
+    <text x="15" y="72" class="attr-text">    name : TEXT  NOT NULL</text>
+    <text x="15" y="92" class="pk-text">🔒 email : TEXT  UNIQUE</text>
+    <text x="15" y="112" class="attr-text">    password : TEXT  (bcrypt 12-rounds)</text>
+    <text x="15" y="132" class="attr-text">    role : ENUM {ADMIN, REVIEWER, USER}</text>
+    <text x="15" y="152" class="attr-text">    createdAt : TIMESTAMP(3)</text>
+    <line x1="0" y1="160" x2="270" y2="160" stroke="#e0e0e0" stroke-dasharray="4,3"/>
+    <text x="15" y="172" class="meta-text">CK: {id}, {email}  ·  Normal Form: BCNF ✓</text>
+  </g>
+
+  <!-- ========== ENTITY: Website (Left Middle) ========== -->
+  <g transform="translate(30, 310)">
+    <rect class="card-bg" width="250" height="155" stroke="#2d6a4f"/>
+    <rect width="250" height="32" rx="8" fill="#2d6a4f"/>
+    <rect x="0" y="24" width="250" height="10" fill="#2d6a4f"/>
+    <text x="125" y="23" text-anchor="middle" class="entity-header">🌐 Website</text>
+    <line x1="0" y1="32" x2="250" y2="32" stroke="#e0e0e0"/>
+    <text x="15" y="52" class="pk-text">🔑 id : UUID (PK)</text>
+    <text x="15" y="72" class="attr-text">    name : TEXT  NOT NULL</text>
+    <text x="15" y="92" class="pk-text">🔒 domain : TEXT  UNIQUE</text>
+    <text x="15" y="112" class="fk-text">🔗 userId : FK → User(id)</text>
+    <text x="15" y="132" class="attr-text">    createdAt : TIMESTAMP(3)</text>
+    <line x1="0" y1="140" x2="250" y2="140" stroke="#e0e0e0" stroke-dasharray="4,3"/>
+    <text x="15" y="152" class="meta-text">CK: {id}, {domain}  ·  BCNF ✓</text>
+  </g>
+
+  <!-- ========== ENTITY: Translation (Right Middle) ========== -->
+  <g transform="translate(720, 275)">
+    <rect class="card-bg" width="295" height="210" stroke="#e76f51"/>
+    <rect width="295" height="32" rx="8" fill="#e76f51"/>
+    <rect x="0" y="24" width="295" height="10" fill="#e76f51"/>
+    <text x="147" y="23" text-anchor="middle" class="entity-header">🔄 Translation</text>
+    <line x1="0" y1="32" x2="295" y2="32" stroke="#e0e0e0"/>
+    <text x="15" y="52" class="pk-text">🔑 id : UUID (PK)</text>
+    <text x="15" y="72" class="attr-text">    sourceText : TEXT  NOT NULL</text>
+    <text x="15" y="92" class="attr-text">    translatedText : TEXT  NOT NULL</text>
+    <text x="15" y="112" class="attr-text">    sourceLanguage : VARCHAR(10)  DEFAULT 'en'</text>
+    <text x="15" y="132" class="attr-text">    targetLanguage : VARCHAR(10)  DEFAULT 'hi'</text>
+    <text x="15" y="152" class="attr-text">    status : ENUM {MACHINE, APPROVED, REJECTED}</text>
+    <text x="15" y="172" class="fk-text">🔗 userId : FK → User(id)</text>
+    <text x="15" y="192" class="fk-text">🔗 websiteId : FK → Website(id)  [NULLABLE]</text>
+  </g>
+
+  <!-- ========== ENTITY: GlossaryTerm (Bottom Left) ========== -->
+  <g transform="translate(30, 540)">
+    <rect class="card-bg" width="270" height="155" stroke="#7209b7"/>
+    <rect width="270" height="32" rx="8" fill="#7209b7"/>
+    <rect x="0" y="24" width="270" height="10" fill="#7209b7"/>
+    <text x="135" y="23" text-anchor="middle" class="entity-header">📖 GlossaryTerm</text>
+    <line x1="0" y1="32" x2="270" y2="32" stroke="#e0e0e0"/>
+    <text x="15" y="52" class="pk-text">🔑 id : UUID (PK)</text>
+    <text x="15" y="72" class="attr-text">    englishTerm : TEXT  NOT NULL</text>
+    <text x="15" y="92" class="attr-text">    hindiTerm : TEXT  NOT NULL</text>
+    <text x="15" y="112" class="fk-text">🔗 websiteId : FK → Website(id)</text>
+    <line x1="0" y1="122" x2="270" y2="122" stroke="#e0e0e0" stroke-dasharray="4,3"/>
+    <text x="15" y="136" class="meta-text">CK: {id}, {websiteId, englishTerm}  ·  BCNF ✓</text>
+    <text x="15" y="148" class="meta-text">COMPOSITE UNIQUE(websiteId, englishTerm)</text>
+  </g>
+
+  <!-- ========== ENTITY: TranslationReview (Bottom Right) ========== -->
+  <g transform="translate(700, 560)">
+    <rect class="card-bg" width="290" height="150" stroke="#d00000"/>
+    <rect width="290" height="32" rx="8" fill="#d00000"/>
+    <rect x="0" y="24" width="290" height="10" fill="#d00000"/>
+    <text x="145" y="23" text-anchor="middle" class="entity-header">📝 TranslationReview</text>
+    <line x1="0" y1="32" x2="290" y2="32" stroke="#e0e0e0"/>
+    <text x="15" y="52" class="pk-text">🔑 id : UUID (PK)</text>
+    <text x="15" y="72" class="fk-text">🔗 translationId : FK → Translation(id)</text>
+    <text x="15" y="92" class="fk-text">🔗 reviewerId : FK → User(id)</text>
+    <text x="15" y="112" class="attr-text">    correctedText : TEXT  (nullable)</text>
+    <text x="15" y="132" class="attr-text">    comments : TEXT  (nullable)</text>
+    <text x="15" y="148" class="attr-text">    createdAt : TIMESTAMP(3)</text>
+  </g>
+
+  <!-- ========== RELATIONSHIP LINES ========== -->
+
+  <!-- User (1) → (N) Website -->
+  <path d="M 435 245 L 435 280 L 155 280 L 155 310" class="rel-line"/>
+  <line x1="427" y1="260" x2="443" y2="260" stroke="#666" stroke-width="2.5"/>
+  <line x1="427" y1="265" x2="443" y2="265" stroke="#666" stroke-width="2.5"/>
+  <line x1="145" y1="310" x2="155" y2="296" stroke="#666" stroke-width="1.8"/>
+  <line x1="155" y1="310" x2="155" y2="296" stroke="#666" stroke-width="1.8"/>
+  <line x1="165" y1="310" x2="155" y2="296" stroke="#666" stroke-width="1.8"/>
+  <text x="270" y="276" class="rel-label" text-anchor="middle">registers / manages</text>
+  <text x="438" y="278" class="cardinality">1</text>
+  <text x="168" y="306" class="cardinality">N</text>
+
+  <!-- User (1) → (N) Translation -->
+  <path d="M 600 245 L 600 265 L 867 265 L 867 275" class="rel-line"/>
+  <line x1="592" y1="258" x2="608" y2="258" stroke="#666" stroke-width="2.5"/>
+  <line x1="857" y1="275" x2="867" y2="262" stroke="#666" stroke-width="1.8"/>
+  <line x1="867" y1="275" x2="867" y2="262" stroke="#666" stroke-width="1.8"/>
+  <line x1="877" y1="275" x2="867" y2="262" stroke="#666" stroke-width="1.8"/>
+  <text x="740" y="260" class="rel-label" text-anchor="middle">initiates</text>
+  <text x="602" y="260" class="cardinality">1</text>
+  <text x="878" y="270" class="cardinality">N</text>
+
+  <!-- User (1) → (N) TranslationReview -->
+  <path d="M 655 180 L 680 180 L 680 625 L 700 625" class="rel-line"/>
+  <line x1="662" y1="173" x2="675" y2="173" stroke="#666" stroke-width="2.5"/>
+  <line x1="662" y1="178" x2="675" y2="178" stroke="#666" stroke-width="2.5"/>
+  <line x1="700" y1="617" x2="690" y2="625" stroke="#666" stroke-width="1.8"/>
+  <line x1="700" y1="625" x2="690" y2="625" stroke="#666" stroke-width="1.8"/>
+  <line x1="700" y1="633" x2="690" y2="625" stroke="#666" stroke-width="1.8"/>
+  <text x="668" y="430" class="rel-label" writing-mode="tb" text-anchor="middle">audits / reviews</text>
+  <text x="675" y="195" class="cardinality">1</text>
+  <text x="688" y="615" class="cardinality">N</text>
+
+  <!-- Website (1) → (N) GlossaryTerm -->
+  <path d="M 155 465 L 155 540" class="rel-line"/>
+  <line x1="147" y1="480" x2="163" y2="480" stroke="#666" stroke-width="2.5"/>
+  <line x1="147" y1="485" x2="163" y2="485" stroke="#666" stroke-width="2.5"/>
+  <line x1="145" y1="540" x2="155" y2="526" stroke="#666" stroke-width="1.8"/>
+  <line x1="155" y1="540" x2="155" y2="526" stroke="#666" stroke-width="1.8"/>
+  <line x1="165" y1="540" x2="155" y2="526" stroke="#666" stroke-width="1.8"/>
+  <text x="175" y="510" class="rel-label">defines vocabulary</text>
+  <text x="160" y="496" class="cardinality">1</text>
+  <text x="168" y="535" class="cardinality">N</text>
+
+  <!-- Website (1) → (N) Translation (optional) -->
+  <path d="M 280 390 L 450 390 L 450 400 L 720 400" class="rel-line"/>
+  <line x1="295" y1="383" x2="310" y2="383" stroke="#666" stroke-width="2.5"/>
+  <line x1="295" y1="388" x2="310" y2="388" stroke="#666" stroke-width="2.5"/>
+  <line x1="720" y1="392" x2="708" y2="400" stroke="#666" stroke-width="1.8"/>
+  <line x1="720" y1="400" x2="708" y2="400" stroke="#666" stroke-width="1.8"/>
+  <line x1="720" y1="408" x2="708" y2="400" stroke="#666" stroke-width="1.8"/>
+  <circle cx="713" cy="400" r="5" fill="none" stroke="#666" stroke-width="1.8"/>
+  <text x="530" y="394" class="rel-label" text-anchor="middle">contains translations (optional FK)</text>
+  <text x="315" y="395" class="cardinality">1</text>
+  <text x="695" y="396" class="cardinality">N</text>
+
+  <!-- Translation (1) → (N) TranslationReview -->
+  <path d="M 867 485 L 867 530 L 845 530 L 845 560" class="rel-line"/>
+  <line x1="859" y1="500" x2="875" y2="500" stroke="#666" stroke-width="2.5"/>
+  <line x1="859" y1="505" x2="875" y2="505" stroke="#666" stroke-width="2.5"/>
+  <line x1="835" y1="560" x2="845" y2="546" stroke="#666" stroke-width="1.8"/>
+  <line x1="845" y1="560" x2="845" y2="546" stroke="#666" stroke-width="1.8"/>
+  <line x1="855" y1="560" x2="845" y2="546" stroke="#666" stroke-width="1.8"/>
+  <text x="878" y="530" class="rel-label">receives feedback</text>
+  <text x="878" y="510" class="cardinality">1</text>
+  <text x="855" y="554" class="cardinality">N</text>
+
+  <!-- ========== LEGEND ========== -->
+  <g transform="translate(340, 670)">
+    <rect width="370" height="38" rx="6" fill="#fff" stroke="#ddd" stroke-width="1"/>
+    <text x="185" y="14" text-anchor="middle" font-size="10" font-weight="bold" fill="#333">Legend</text>
+    <text x="20" y="30" class="legend-text">🔑 Primary Key    🔗 Foreign Key    🔒 Unique Constraint</text>
+    <line x1="265" y1="30" x2="275" y2="22" stroke="#666" stroke-width="1.5"/>
+    <line x1="275" y1="30" x2="275" y2="22" stroke="#666" stroke-width="1.5"/>
+    <line x1="285" y1="30" x2="275" y2="22" stroke="#666" stroke-width="1.5"/>
+    <text x="288" y="30" class="legend-text"> Many    ── One    ○ Optional</text>
+  </g>
+</svg>

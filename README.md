@@ -39,6 +39,12 @@ SEM3MajorProjectSubmission/
 │   ├── .env.example              # Example environment configuration for Backend
 │   └── package.json
 │
+├── DE/                            # Data Engineering Major Project Deliverables
+│   ├── README.md                  # Comprehensive DBMS, ER & Normalization report
+│   ├── schema.sql                 # PostgreSQL DDL & constraint architecture
+│   ├── seed_data.sql              # Realistic government portal seed data
+│   └── queries.sql                # 12 project-specific SQL queries & outputs
+│
 ├── Frontend/                     # Vite + React Portal Demonstration
 │   ├── src/
 │   │   ├── components/           # Navbar, Header, Hero, LanguageSelector, TranslationWidget
@@ -56,6 +62,82 @@ SEM3MajorProjectSubmission/
 ├── .env.example                  # Root environment template
 └── README.md                     # Project documentation
 ```
+
+---
+
+## 🗄️ Database Architecture & Entity-Relationship (ER) Model
+
+The persistent data layer is implemented in **PostgreSQL 16+** using **Prisma ORM**. The relational schema is normalized to **Boyce-Codd Normal Form (BCNF)** to eliminate redundancy and maintain strict ACID compliance for multi-tenant portal management and audit trails.
+
+### Entity-Relationship Diagram (Crow's Foot Notation)
+
+```mermaid
+erDiagram
+    User ||--o{ Website : "registers / owns (1:N)"
+    User ||--o{ Translation : "initiates (1:N)"
+    User ||--o{ TranslationReview : "audits (1:N)"
+    Website ||--o{ GlossaryTerm : "defines custom vocabulary (1:N)"
+    Website ||--o{ Translation : "contains localized segments (1:N)"
+    Translation ||--o{ TranslationReview : "receives feedback (1:N)"
+
+    User {
+        string id PK "UUID v4"
+        string name "Citizen / Officer Name"
+        string email UK "Unique Normalized Email"
+        string password "Bcrypt Hashed (12 rounds)"
+        Role role "Enum: ADMIN | REVIEWER | USER"
+        datetime createdAt "Timestamp"
+    }
+
+    Website {
+        string id PK "UUID v4"
+        string name "Portal Title"
+        string domain UK "Unique Normalized Hostname"
+        string userId FK "References User(id)"
+        datetime createdAt "Timestamp"
+    }
+
+    GlossaryTerm {
+        string id PK "UUID v4"
+        string englishTerm "Source Term"
+        string hindiTerm "Mandated Rajbhasha Term"
+        string websiteId FK "References Website(id)"
+    }
+
+    Translation {
+        string id PK "UUID v4"
+        string sourceText "Raw English Web Content"
+        string translatedText "Target Hindi Content"
+        string sourceLanguage "Default: 'en'"
+        string targetLanguage "Default: 'hi'"
+        TranslationStatus status "Enum: MACHINE | APPROVED | REJECTED"
+        datetime createdAt "Timestamp"
+        string userId FK "References User(id)"
+        string websiteId FK "Nullable; References Website(id)"
+    }
+
+    TranslationReview {
+        string id PK "UUID v4"
+        string translationId FK "References Translation(id)"
+        string reviewerId FK "References User(id)"
+        string correctedText "Amended Hindi Phrasing"
+        string comments "Reviewer Justification"
+        datetime createdAt "Timestamp"
+    }
+```
+
+### Relational Schema & Cardinality Summary
+
+| Entity | Description | Relationships & Referential Integrity Rules |
+|---|---|---|
+| **`User`** | Platform users (Administrators, Certified Linguists, Citizens). | Has 1:N relations with `Website`, `Translation`, and `TranslationReview`. |
+| **`Website`** | Public service portals (e.g., `powermin.gov.in`). | `userId` $\rightarrow$ `User(id)` (`ON DELETE RESTRICT`). Has 1:N relations with `GlossaryTerm` and `Translation`. |
+| **`GlossaryTerm`** | Pre-approved departmental vocabulary per portal. | `websiteId` $\rightarrow$ `Website(id)` (`ON DELETE RESTRICT`). Composite unique constraint on `(websiteId, englishTerm)`. |
+| **`Translation`** | Persistent audit log of localized sentences. | `userId` $\rightarrow$ `User(id)` (`ON DELETE RESTRICT`), `websiteId` $\rightarrow$ `Website(id)` (**`ON DELETE SET NULL`** preserves historical logs if a site is decommissioned). |
+| **`TranslationReview`** | Associative entity resolving **M:N** between `Translation` and `User`. | `translationId` $\rightarrow$ `Translation(id)` (`ON DELETE RESTRICT`), `reviewerId` $\rightarrow$ `User(id)` (`ON DELETE RESTRICT`). Stores `correctedText` and `comments`. |
+
+> [!NOTE]
+> Detailed mathematical normalization proofs (1NF $\rightarrow$ 2NF $\rightarrow$ 3NF $\rightarrow$ BCNF), 12 project-specific SQL queries, and the 100x scalability plan are documented in [`DE/README.md`](./DE/README.md) and [`docs/database_er_modeling.md`](./docs/database_er_modeling.md).
 
 ---
 
